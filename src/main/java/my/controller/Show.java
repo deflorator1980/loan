@@ -1,7 +1,5 @@
 package my.controller;
 
-import lombok.RequiredArgsConstructor;
-import my.model.Person;
 import my.repo.ApplyRepository;
 import my.repo.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +11,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class Show {
 
-    @Autowired
-    PersonRepository personRepository;
+    private final PersonRepository personRepository;
+
+    private final ApplyRepository applyRepository;
 
     @Autowired
-    ApplyRepository applyRepository;
+    public Show(PersonRepository personRepository, ApplyRepository applyRepository) {
+        this.personRepository = personRepository;
+        this.applyRepository = applyRepository;
+    }
 
     @RequestMapping("/person")
     public ResponseEntity<?> person() {

@@ -30,6 +30,8 @@ public class App {
     public CommandLineRunner apply(ApplyRepository repository) {
         return (args)-> {
             repository.save(new Apply(new BigDecimal(12), new Date(), "01", true));
+            repository.save(new Apply(new BigDecimal(122), new Date(), "01", false));
+            repository.save(new Apply(new BigDecimal(11), new Date(), "02", true));
         };
     }
 
