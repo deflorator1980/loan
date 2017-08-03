@@ -1,9 +1,6 @@
 package my.controller;
 
-import my.model.Apply;
-import my.model.IpApi;
-import my.model.Loans;
-import my.model.Person;
+import my.model.*;
 import my.repo.LoansRepository;
 import my.repo.PersonRepository;
 import org.slf4j.Logger;
@@ -15,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class Show {
@@ -24,6 +24,9 @@ public class Show {
     private final PersonRepository personRepository;
 
     private final LoansRepository loansRepository;
+
+    private final Map<String, Long> countries0 = new HashMap<>();
+    private final Map<String, Long> countries = Collections.synchronizedMap(countries0); // todo check by code inspection
 
     @Autowired
     public Show(PersonRepository personRepository, LoansRepository loansRepository) {
@@ -57,6 +60,22 @@ public class Show {
 
     @RequestMapping(value = "/apply", method = RequestMethod.POST)
     public ResponseEntity<?> apply(@RequestBody Apply apply, HttpServletRequest request) {
+        RestTemplate restTemplate = new RestTemplate();
+        String ip = request.getRemoteAddr();
+        ResponseEntity<IpApi> resp = restTemplate.getForEntity("http://ip-api.com/json/" + ip, IpApi.class);
+        IpApi ipApi = resp.getBody();
+        log.info(ipApi.toString());
+        String country = ipApi.getCountry();
+        if (country == null) {      // todo try without internet
+            country = "lv";
+        }
+
+        Long time = countries.get(country);
+        if ((time != null) && ((System.nanoTime() - time) > 500_000_000)) {
+            return new ResponseEntity<Object>(new CountryBan(country, "Too many requests from your country"), HttpStatus.CONFLICT);
+        }
+        countries.put(country, System.nanoTime());  //todo test it
+
         Person person = personRepository.findOne(apply.getId());
         System.out.println(person);
         if (person == null) {
@@ -66,17 +85,6 @@ public class Show {
         if(person.isBan()) {
             return new ResponseEntity<Object>(person, HttpStatus.BAD_REQUEST);
         }
-
-        RestTemplate restTemplate = new RestTemplate();
-        String ip = request.getRemoteAddr();
-        ResponseEntity<IpApi> resp = restTemplate.getForEntity("http://ip-api.com/json/" + ip, IpApi.class);
-        IpApi ipApi = resp.getBody();
-        log.info(ipApi.toString());
-        String country = ipApi.getCountry();
-        if (country == null) {
-            country = "lv";
-        }
-
 
         Loans loans = new Loans();
         loans.setAmount(apply.getAmount());
