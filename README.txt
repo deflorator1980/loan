@@ -1,0 +1,1 @@
+curl -H "Content-Type: application/json" -X POST -d '{ "id": "42", "amount": 1234, "term": 4342, "name": "name", "surname": "surname"}' http://localhost:8080/apply
