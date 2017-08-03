@@ -21,3 +21,12 @@ Conformance to business requirements
 Code quality, including testability
 How easy it is to run and deploy the service (don't make us install Oracle database please ;)
 Good luck and have fun!
+
+
+{
+	"id": "03",
+    "amount": 1501753529097,
+    "term": 232,
+    "name": "Xer",
+    "surname": "Morse"
+}

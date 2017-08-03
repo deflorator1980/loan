@@ -1,8 +1,7 @@
 package my;
 
-import my.model.Apply;
 import my.model.Person;
-import my.repo.ApplyRepository;
+import my.repo.LoansRepository;
 import my.repo.PersonRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -27,11 +26,12 @@ public class App {
     }
 
     @Bean
-    public CommandLineRunner apply(ApplyRepository repository) {
+    public CommandLineRunner loans(LoansRepository repository) {
         return (args)-> {
-            repository.save(new Apply(new BigDecimal(12), new Date(), "01", true));
-            repository.save(new Apply(new BigDecimal(122), new Date(), "01", false));
-            repository.save(new Apply(new BigDecimal(11), new Date(), "02", true));
+            repository.save(new my.model.Loans(new BigDecimal(12), 124312L, "01", true));
+            repository.save(new my.model.Loans(new BigDecimal(122), 1214L, "01", false));
+            repository.save(new my.model.Loans(new BigDecimal(11), 452L, "02", true));
+            repository.save(new my.model.Loans(new BigDecimal(22), 444L, "02", true));
         };
     }
 
