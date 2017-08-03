@@ -31,10 +31,14 @@ public class Loans {
     @Getter @Setter
     private boolean isApproved;
 
-    public Loans(BigDecimal amount, Long term, String personId, boolean isApproved) {
+    @Getter @Setter
+    private String country;
+
+    public Loans(BigDecimal amount, Long term, String personId, boolean isApproved, String country) {
         this.amount = amount;
         this.term = term;
         this.personId = personId;
         this.isApproved = isApproved;
+        this.country = country;
     }
 }

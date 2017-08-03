@@ -22,16 +22,17 @@ public class App {
         return (args )-> {
             repository.save(new Person("01", "Name1", "Surname1", false));
             repository.save(new Person("02", "Name2", "Surname2", false));
+            repository.save(new Person("03", "Name3", "Surname3", true));
         };
     }
 
     @Bean
     public CommandLineRunner loans(LoansRepository repository) {
         return (args)-> {
-            repository.save(new my.model.Loans(new BigDecimal(12), 124312L, "01", true));
-            repository.save(new my.model.Loans(new BigDecimal(122), 1214L, "01", false));
-            repository.save(new my.model.Loans(new BigDecimal(11), 452L, "02", true));
-            repository.save(new my.model.Loans(new BigDecimal(22), 444L, "02", true));
+            repository.save(new my.model.Loans(new BigDecimal(12), 124312L, "01", true, "lv"));
+            repository.save(new my.model.Loans(new BigDecimal(122), 1214L, "01", false, "lv"));
+            repository.save(new my.model.Loans(new BigDecimal(11), 452L, "02", true, "lv"));
+            repository.save(new my.model.Loans(new BigDecimal(22), 444L, "02", true, "lv"));
         };
     }
 
