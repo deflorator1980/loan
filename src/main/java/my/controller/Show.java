@@ -5,6 +5,8 @@ import my.model.Loans;
 import my.model.Person;
 import my.repo.LoansRepository;
 import my.repo.PersonRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class Show {
+
+    private static final Logger log = LoggerFactory.getLogger(Show.class);
 
     private final PersonRepository personRepository;
 
@@ -45,12 +49,12 @@ public class Show {
 
     @RequestMapping(value = "/apply", method = RequestMethod.POST)
     public ResponseEntity<?> apply(@RequestBody Apply apply) {
-        Person person = new Person(apply.getId(), apply.getName(), apply.getSurname(), false);
-//        person.setId(apply.getId());
-//        person.setName(apply.getName());
-//        person.setSurname(apply.getSurname());
-//        person.setBan(false);
-        personRepository.save(person);
+        Person person = personRepository.findOne(apply.getId());
+        System.out.println(person);
+        if (person == null) {
+            person = new Person(apply.getId(), apply.getName(), apply.getSurname(), false);
+            personRepository.save(person);
+        }
 
         Loans loans = new Loans();
         loans.setAmount(apply.getAmount());

@@ -16,6 +16,7 @@ import java.util.Date;
 public class Loans {
     @Id
     @GeneratedValue
+    @Getter
     private long id;
 
     @Getter @Setter
