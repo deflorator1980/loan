@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.ConnectException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class Show {
     @RequestMapping("/approveduser")
     public ResponseEntity<?> approvedUser(@RequestParam(value = "user_id") String userId) {
         Person person = personRepository.findOne(userId);
-        if(person.isBan()) {
+        if (person.isBan()) {
             return new ResponseEntity<Object>(person, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<Object>(loansRepository.findByIsApprovedAndPersonId(true, userId), HttpStatus.OK);
@@ -60,18 +61,26 @@ public class Show {
 
     @RequestMapping(value = "/apply", method = RequestMethod.POST)
     public ResponseEntity<?> apply(@RequestBody Apply apply, HttpServletRequest request) {
+        String country = null;
         RestTemplate restTemplate = new RestTemplate();
         String ip = request.getRemoteAddr();
-        ResponseEntity<IpApi> resp = restTemplate.getForEntity("http://ip-api.com/json/" + ip, IpApi.class);
-        IpApi ipApi = resp.getBody();
-        log.info(ipApi.toString());
-        String country = ipApi.getCountry();
+        try {
+            ResponseEntity<IpApi> resp = restTemplate.getForEntity("http://ip-api.com/json/" + ip, IpApi.class);
+            IpApi ipApi = resp.getBody();
+            log.info(ipApi.toString());
+            country = ipApi.getCountry();
+        } catch (Exception ce) {
+            log.warn(ce.getMessage());
+        }
         if (country == null) {      // todo try without internet
             country = "lv";
         }
 
         Long time = countries.get(country);
-        if ((time != null) && ((System.nanoTime() - time) > 500_000_000)) {
+        Long currentTime = System.nanoTime();
+        log.info("time:" + time);
+        log.info("currentTime:" + currentTime);
+        if ((time != null) && ((currentTime - time) < 2_000_000_000)) {
             return new ResponseEntity<Object>(new CountryBan(country, "Too many requests from your country"), HttpStatus.CONFLICT);
         }
         countries.put(country, System.nanoTime());  //todo test it
@@ -82,7 +91,7 @@ public class Show {
             person = new Person(apply.getId(), apply.getName(), apply.getSurname(), false);
             personRepository.save(person);
         }
-        if(person.isBan()) {
+        if (person.isBan()) {
             return new ResponseEntity<Object>(person, HttpStatus.BAD_REQUEST);
         }
 
