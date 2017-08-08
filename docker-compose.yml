@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  loan:
+    build: .
+    image: deflorator1980/loan
+    network_mode: "host"
+    ports:
+      - 8080:8080
